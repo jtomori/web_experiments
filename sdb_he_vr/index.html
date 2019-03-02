@@ -1,1 +1,24 @@
-Hello sdb_he_vr
+<!DOCTYPE html>
+<html lang="sk">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Saleziánske stredisko Humenné</title>
+        <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+        <script src="components.js"></script>
+    </head>
+    <body>
+        <a-scene id="root" background="color: black" light="defaultLightsEnabled: false" vr-mode-ui="enabled: false">
+            <a-assets>
+                <img id="day_1" src="img/ren_v003_day_8.jpg">
+                <img id="day_2" src="img/ren_v003_day_9.jpg">
+                <img id="day_3" src="img/ren_v003_day_10.jpg">
+                <img id="night_1" src="img/ren_v003_night_8.jpg">
+                <img id="night_2" src="img/ren_v003_night_9.jpg">
+                <img id="night_3" src="img/ren_v003_night_10.jpg">
+            </a-assets>
+            <a-entity id="cam" camera look-controls></a-entity>
+            <a-sky id="env_sphere" src="#day_1"></a-sky>
+        </a-scene>
+    </body>
+</html>
