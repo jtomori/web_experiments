@@ -82,12 +82,15 @@ function init() {
             else if (event.target.className === "controls_switch-prev")
                 panorama_number = (panorama_number - 1) % panoramas_len;
 
-            else if (event.target.className === "controls_switch-mode")
+            else if (event.target.className.startsWith("controls_switch-mode")) {
                 panorama_mode = +!panorama_mode;
 
-            // load texture
-            //let new_tex = new THREE.TextureLoader().load( panorama_paths[ Math.abs(panorama_number) ] );
-            //new_tex.minFilter = THREE.LinearFilter;
+                // toggle alt class
+                if (event.target.className.endsWith(" alt"))
+                    event.target.className = "controls_switch-mode";
+                else
+                    event.target.className += " alt";
+            }
 
             let new_tex = panorama_textures[ Math.abs(panorama_number) + panoramas_len * panorama_mode ];
 
