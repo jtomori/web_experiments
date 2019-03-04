@@ -9,3 +9,12 @@ body {
   position: relative;
   bottom: 75px;
 }
+
+.pagination {
+  opacity: 0.5;
+  transition: opacity .25s ease;
+}
+
+body:hover .pagination {
+  opacity: 1;
+}
