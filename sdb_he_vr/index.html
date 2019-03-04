@@ -4,18 +4,30 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Saleziánske stredisko Humenné</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
         <link rel="stylesheet" href="styles.css">
         <script defer src="https://unpkg.com/three@0.102/build/three.min.js"></script>
         <script defer src="panorama.js"></script>
     </head>
     <body>
         <div id="container"></div>
-        <div class="controls">
-            <ul>
-                <li class="controls_switch-prev"></li>
-                <li class="controls_switch-mode alt"></li>
-                <li class="controls_switch-next"></li>
-            </ul>
-        </div>
+        <ul class="pagination justify-content-center over-canvas">
+            <li class="page-item switch-prev">
+                <a class="page-link" href="#">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>
+            <li class="page-item switch-mode">
+                <a class="page-link" href="#">
+                    <i class="fas fa-moon"></i>
+                </a>
+            </li>
+            <li class="page-item switch-next">
+                <a class="page-link" href="#">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
     </body>
 </html>

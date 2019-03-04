@@ -40,6 +40,7 @@ function init() {
     // sphere with flipped normals
     let geometry = new THREE.SphereBufferGeometry( 500, 64, 64 );
     geometry.scale( - 1, 1, 1 );
+    geometry.rotateY(Math.PI * -1);
     
     // initial texture
     let tex = new THREE.TextureLoader().load( panorama_paths[panorama_number] );
@@ -70,26 +71,30 @@ function init() {
     window.addEventListener( 'resize', onWindowResize);
 
     // switching images
-    let switch_buttons = document.querySelectorAll('.controls li[class*="switch"]');
+    let switch_buttons = document.querySelectorAll('.pagination li[class*="switch-"]');
 
     for (let i = 0; i < switch_buttons.length; i++) {
         switch_buttons[i].onclick = function (event) {
             let panoramas_len = panorama_paths.length / 2;
-
-            if (event.target.className === "controls_switch-next")
+            if (this.className.includes("switch-next"))
                 panorama_number = (panorama_number + 1) % panoramas_len;
 
-            else if (event.target.className === "controls_switch-prev")
+            else if (this.className.includes("switch-prev"))
                 panorama_number = (panorama_number - 1) % panoramas_len;
 
-            else if (event.target.className.startsWith("controls_switch-mode")) {
+            else if (this.className.includes("switch-mode")) {
                 panorama_mode = +!panorama_mode;
-
-                // toggle alt class
-                if (event.target.className.endsWith(" alt"))
-                    event.target.className = "controls_switch-mode";
-                else
-                    event.target.className += " alt";
+                
+                // toggle alt class, icon
+                let icon = this.querySelector(".page-link .fas");
+                if (this.className.endsWith(" alt")) {
+                    this.className = this.className.replace(" alt", "");
+                    icon.className = icon.className.replace("fa-sun", "fa-moon");
+                }
+                else {
+                    this.className += " alt";
+                    icon.className = icon.className.replace("fa-moon", "fa-sun");
+                }
             }
 
             let new_tex = panorama_textures[ Math.abs(panorama_number) + panoramas_len * panorama_mode ];
@@ -103,14 +108,14 @@ function init() {
 function update() {
     // cam rotation
     if ( isUserInteracting === false ) {
-        lon -= 0.025;
+        lon += 0.025;
     }
 
     lat = Math.max( - 85, Math.min( 85, lat ) );
     phi = THREE.Math.degToRad( 90 - lat );
     theta = THREE.Math.degToRad( lon );
-    camera.target.x = -1 * Math.sin( phi ) * Math.cos( theta );
-    camera.target.y = -1 * Math.cos( phi );
+    camera.target.x = 1 * Math.sin( phi ) * Math.cos( theta );
+    camera.target.y = 1 * Math.cos( phi );
     camera.target.z = Math.sin( phi ) * Math.sin( theta );
     camera.lookAt( camera.target );
     
