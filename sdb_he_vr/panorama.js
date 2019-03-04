@@ -23,6 +23,7 @@ let panorama_paths = [
 ];
 
 let panorama_textures = [];
+let panorama_mode = 0;
 
 function init() {
     // div container
@@ -73,18 +74,22 @@ function init() {
 
     for (let i = 0; i < switch_buttons.length; i++) {
         switch_buttons[i].onclick = function (event) {
-            let panoramas_len = panorama_paths.length;
+            let panoramas_len = panorama_paths.length / 2;
 
             if (event.target.className === "controls_switch-next")
                 panorama_number = (panorama_number + 1) % panoramas_len;
-            else
+
+            else if (event.target.className === "controls_switch-prev")
                 panorama_number = (panorama_number - 1) % panoramas_len;
+
+            else if (event.target.className === "controls_switch-mode")
+                panorama_mode = +!panorama_mode;
 
             // load texture
             //let new_tex = new THREE.TextureLoader().load( panorama_paths[ Math.abs(panorama_number) ] );
             //new_tex.minFilter = THREE.LinearFilter;
 
-            let new_tex = panorama_textures[ Math.abs(panorama_number) ];
+            let new_tex = panorama_textures[ Math.abs(panorama_number) + panoramas_len * panorama_mode ];
 
             // assign new texture
             material.map = new_tex;
@@ -118,11 +123,12 @@ init();
 animate();
 loadTextures();
 
-// loads all textures
+// load all textures
 function loadTextures() {
     for (let i = 1; i < panorama_paths.length; i++) {
         let new_tex = new THREE.TextureLoader().load( panorama_paths[i] )
         new_tex.minFilter = THREE.LinearFilter;
+
         panorama_textures[i] = new_tex;
     }
 }

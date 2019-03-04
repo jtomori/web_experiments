@@ -13,7 +13,7 @@ ul {
   width: 290px;
   position: absolute;
   bottom: 0;
-  left: 50%;
+  left: 51%;
   transform: translate(-50%, -50%);
 }
 
@@ -68,4 +68,12 @@ ul {
               border-right: 2px solid transparent;
               border-top: 2px solid transparent;
               border-color: #7acbe4;
+            }
+
+            .controls li.controls_switch-mode:after {
+              left: 10px;
+              top: 11px;
+              border: 2px solid transparent;
+              border-color: #7acbe4;
+              border-radius: 50%;
             }
