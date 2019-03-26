@@ -37,7 +37,7 @@ let raymarching_fragment_shader = `
         float dist;
         float depth = 0.0;
         vec3 pos = origin;
-        for (int i = 0; i < 128; i++){
+        for (int i = 0; i < 16; i++){
             dist = scene_dist(pos);
             depth += dist;
             pos = origin + depth * ray;
@@ -53,7 +53,7 @@ let raymarching_fragment_shader = `
 
             color = vec3(0.9) * diffuse + vec3(0.05);
         } else {
-            color = vec3(0.0);
+            color = vec3(0.6, 0.0, 0.0);
         }
 
         return color;
@@ -91,23 +91,19 @@ let raymarching_vertex_shader = `
 `
 
 // globals
-let canvas = document.querySelector('#canvas');
-let dolly, camera, scene, renderer, material;
+let dolly, camera, scene, renderer, material, controls;
 
 let stats;
-let config = {
-    saveImage: function () {
-        renderer.render( scene, camera );
-        window.open( canvas.toDataURL() );
-    },
-    resolution: '800'
-};
 
 function init() {
+    let container = document.getElementById('container');
+
     // renderer
-    renderer = new THREE.WebGLRenderer({ canvas: canvas });
+    renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(config.resolution, config.resolution);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+    
     window.addEventListener('resize', onWindowResize);
 
     // scene
@@ -116,7 +112,7 @@ function init() {
     dolly = new THREE.Group();
     scene.add(dolly);
 
-    camera = new THREE.PerspectiveCamera(60, canvas.width / canvas.height, 1, 2000);
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
     camera.position.z = 4;
     dolly.add(camera);
     
@@ -126,7 +122,7 @@ function init() {
     geometry = new THREE.PlaneBufferGeometry(2.0, 2.0);
     material = new THREE.RawShaderMaterial({
         uniforms: {
-            resolution: { value: new THREE.Vector2(canvas.width, canvas.height) },
+            resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
             cameraWorldMatrix: { value: camera.matrixWorld },
             cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse(camera.projectionMatrix) }
         },
@@ -138,12 +134,7 @@ function init() {
     scene.add(mesh);
 
     // cam controls
-    let controls = new THREE.OrbitControls(camera, canvas);
-
-    // gui
-    let gui = new dat.GUI();
-    gui.add(config, 'saveImage').name('Save Image');
-    gui.add(config, 'resolution', [ '256', '512', '800', 'full' ]).name('Resolution').onChange(onWindowResize);
+    controls = new THREE.OrbitControls(camera);
     
     // stats
     stats = new Stats();
@@ -151,24 +142,21 @@ function init() {
 }
 
 function onWindowResize() {
-    // set resolution based on config or window size if full
-    if (config.resolution === 'full') {
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    } else {
-        renderer.setSize(config.resolution, config.resolution);
-    }
-
     // update material uniforms
-    camera.aspect = canvas.width / canvas.height;
+    camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    material.uniforms.resolution.value.set(canvas.width, canvas.height);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    
+    material.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
     material.uniforms.cameraProjectionMatrixInverse.value.getInverse(camera.projectionMatrix);
 }
 
 function render(time) {
     // measure fps and render
     stats.begin();
+
     renderer.render(scene, camera);
+
     stats.end();
 
     requestAnimationFrame(render);
