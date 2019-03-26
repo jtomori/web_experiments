@@ -1,4 +1,16 @@
-let raymarching_fragment_shader = `
+AFRAME.registerShader("raymarching", {
+    /*
+    TBD
+    */
+    raw: true,
+    vertexShader: `
+        attribute vec3 position;
+
+        void main(void) {
+            gl_Position = vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
     precision highp float;
 
     uniform vec2 resolution;
@@ -37,7 +49,9 @@ let raymarching_fragment_shader = `
         float dist;
         float depth = 0.0;
         vec3 pos = origin;
-        for (int i = 0; i < 16; i++){
+
+        #pragma unroll_loop
+        for ( int i = 0; i < 16; i ++ ){
             dist = scene_dist(pos);
             depth += dist;
             pos = origin + depth * ray;
@@ -80,87 +94,5 @@ let raymarching_fragment_shader = `
 
         gl_FragColor = vec4(color, 1.0);
     }
-`
-
-let raymarching_vertex_shader = `
-    attribute vec3 position;
-
-    void main(void) {
-        gl_Position = vec4(position, 1.0);
-    }
-`
-
-// globals
-let dolly, camera, scene, renderer, material, controls;
-
-let stats;
-
-function init() {
-    let container = document.getElementById('container');
-
-    // renderer
-    renderer = new THREE.WebGLRenderer();
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    container.appendChild(renderer.domElement);
-    
-    window.addEventListener('resize', onWindowResize);
-
-    // scene
-    scene = new THREE.Scene();
-
-    dolly = new THREE.Group();
-    scene.add(dolly);
-
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
-    camera.position.z = 4;
-    dolly.add(camera);
-    
-    // quad
-    let geometry, mesh;
-
-    geometry = new THREE.PlaneBufferGeometry(2.0, 2.0);
-    material = new THREE.RawShaderMaterial({
-        uniforms: {
-            resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-            cameraWorldMatrix: { value: camera.matrixWorld },
-            cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse(camera.projectionMatrix) }
-        },
-        vertexShader: raymarching_vertex_shader,
-        fragmentShader: raymarching_fragment_shader
-    });
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.frustumCulled = false;
-    scene.add(mesh);
-
-    // cam controls
-    controls = new THREE.OrbitControls(camera);
-    
-    // stats
-    stats = new Stats();
-    document.body.appendChild(stats.dom);
-}
-
-function onWindowResize() {
-    // update material uniforms
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    
-    material.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
-    material.uniforms.cameraProjectionMatrixInverse.value.getInverse(camera.projectionMatrix);
-}
-
-function render(time) {
-    // measure fps and render
-    stats.begin();
-
-    renderer.render(scene, camera);
-
-    stats.end();
-
-    requestAnimationFrame(render);
-}
-
-init();
-render();
+    `
+});

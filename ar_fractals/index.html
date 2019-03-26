@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>AR Fractals</title>
+        <title>AR Fractals | Mandelbulb</title>
         <link rel="stylesheet" href="styles.css">
-        <script defer src="https://unpkg.com/three@0.102/build/three.min.js"></script>
-        <script defer src="https://unpkg.com/three@0.102/examples/js/controls/OrbitControls.js"></script>
-        <script defer src="https://unpkg.com/dat.gui@0.7.5/build/dat.gui.min.js"></script>
-        <script defer src="https://unpkg.com/stats.js@0.17/build/stats.min.js"></script>
-        <script defer src="fractals.js"></script>
+        <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+        <script src="components.js"></script>
+        <script src="shaders.js"></script>
     </head>
     <body>
-        <div id="container"></div>
+        <a-scene background="color: black" >
+            <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+            <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+        </a-scene>
     </body>
 </html>
