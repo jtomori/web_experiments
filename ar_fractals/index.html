@@ -2,19 +2,21 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>AR Fractals | Mandelbulb</title>
         <link rel="stylesheet" href="styles.css">
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
         <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+        <!-- <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar.js"></script> -->
         <script src="components.js"></script>
-        <script src="shaders.js"></script>
     </head>
     <body>
-        <a-scene background="color: black" >
+        <a-scene light="defaultLightsEnabled: false">
+        <!-- <a-scene light="defaultLightsEnabled: false" embedded arjs> -->
             <a-entity id="cam" camera look-controls></a-entity>
-            <a-entity screen-quad></a-entity>
+            <a-entity id="screen-quad" screen-quad></a-entity>
+            <!-- <a-marker-camera preset="hiro"></a-marker-camera> -->
 
-            <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" material="depthTest: false; color: #FFC65D"></a-cylinder>
+            <a-box position="1 0.5 -2" material="depthTest: false; shader: flat; opacity: 0.9; color: red"></a-box>
         </a-scene>
     </body>
 </html>

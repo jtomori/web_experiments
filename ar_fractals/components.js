@@ -20,7 +20,7 @@ let raymarching_fragment_shader = `
     }
 
     float scene_dist(vec3 p) {
-        return sphere_dist(p + vec3(0.0, 0.0, 1.7), 1.0);
+        return sphere_dist(p + vec3(-1.0, 0.0, -1.0), 0.3);
     }
 
     vec3 get_normal(vec3 p) {
@@ -91,30 +91,22 @@ let raymarching_vertex_shader = `
     }
 `
 
-AFRAME.registerComponent("frustum-disable", {
-    /*
-    TBD
-    */
-    init: function () {
-        let object_3D = this.el.object3D.children[0];
-        object_3D.frustumCulled = false;
-    }
-});
-
 AFRAME.registerComponent("screen-quad", {
     /*
-    TBD
+    Create screen-covering polygon and attach raymarching shaders to it
     */
     init: function () {
-        let scene = this.el.sceneEl.object3D;
         let camera = document.querySelector('#cam').components.camera.camera;
 
         let quad_geometry, quad_mesh, quad_material;
 
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+
         quad_geometry = new THREE.PlaneBufferGeometry(2.0, 2.0);
         quad_material = new THREE.RawShaderMaterial({
             uniforms: {
-                resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                resolution: { value: new THREE.Vector2(width, height) },
                 cameraWorldMatrix: { value: camera.matrixWorld },
                 cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse(camera.projectionMatrix) }
             },
@@ -126,5 +118,21 @@ AFRAME.registerComponent("screen-quad", {
         quad_mesh.frustumCulled = false;
         
         this.el.setObject3D("mesh", quad_mesh);
+
+        window.addEventListener('resize', onWindowResize);
     }
 });
+
+function onWindowResize() {
+    /*
+    Update screen quad material uniforms to reflect window size changes
+    */
+    let camera = document.querySelector('#cam').components.camera.camera;
+    let screen_quad = document.querySelector('#screen-quad').object3DMap["mesh"];
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    screen_quad.material.uniforms.resolution.value.set(width, height);
+    screen_quad.material.uniforms.cameraProjectionMatrixInverse.value.getInverse(camera.projectionMatrix);
+}
