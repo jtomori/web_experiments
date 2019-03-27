@@ -2,7 +2,6 @@ let raymarching_fragment_shader = `
     precision highp float;
 
     uniform vec2 resolution;
-    uniform mat4 viewMatrix;
     uniform vec3 cameraPosition;
     uniform mat4 cameraWorldMatrix;
     uniform mat4 cameraProjectionMatrixInverse;
@@ -115,7 +114,7 @@ function init() {
     camera.position.z = 3;
     
     // quad
-    let quad_geometry, mesh;
+    let quad_geometry, quad_mesh;
 
     quad_geometry = new THREE.PlaneBufferGeometry(2.0, 2.0);
     quad_material = new THREE.RawShaderMaterial({
