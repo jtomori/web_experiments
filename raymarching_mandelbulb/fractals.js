@@ -6,7 +6,7 @@ let raymarching_fragment_shader = `
     uniform mat4 cameraWorldMatrix;
     uniform mat4 cameraProjectionMatrixInverse;
 
-    const float EPS = 0.01;
+    const float EPS = 0.005;
     const vec3 light_dir = vec3(-0.48666426339228763, 0.8111071056538127, -0.3244428422615251);
     
     // distance functions
@@ -18,26 +18,81 @@ let raymarching_fragment_shader = `
         return dot(p, vec3(0.0, 1.0, 0.0)) + 1.0;
     }
 
+    float mandelbulb_dist(vec3 p) {
+        float distance;
+        float de = 1.0;
+        float power = 8.0;
+        vec3 p_in = p;
+
+        for (int i = 0; i < 8; i++) {
+            distance = length(p);
+            if (distance > 2.0) break;
+
+            float theta = acos(p.z / distance);
+            float phi = atan(p.x, p.y);
+            de = pow(distance, power-1.0) * power * de + 1.0;
+            float zr = pow(distance, power);
+            theta *= power;
+            phi *= power;
+            p = zr * vec3( sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta) );
+            p += p_in;
+        }
+
+        return 0.5 * log(distance) * distance / de;
+    }
+
+    float mandelbulb_poly_dist(vec3 p) {
+        float de = 1.0;
+        float m = dot(p, p);
+        vec3 p_in = p;
+
+        for (int i = 0; i < 4; i++) {
+            float m2 = m*m;
+            float m4 = m2*m2;
+            de = 8.0*sqrt(m4*m2*m)*de + 1.0;
+
+            float x = p.x; float x2 = x*x; float x4 = x2*x2;
+            float y = p.y; float y2 = y*y; float y4 = y2*y2;
+            float z = p.z; float z2 = z*z; float z4 = z2*z2;
+            
+            float k3 = x2 + z2;
+            float k2 = inversesqrt(k3*k3*k3*k3*k3*k3*k3);
+            float k1 = x4 + y4 + z4 - 6.0*y2*z2 - 6.0*x2*y2 + 2.0*z2*x2;
+            float k4 = x2 - y2 + z2;
+            
+            p.x =  64.0*x*y*z*(x2-z2)*k4*(x4-6.0*x2*z2+z4)*k1*k2;
+            p.y = -16.0*y2*k3*k4*k4 + k1*k1;
+            p.z = -8.0*y*k4*(x4*x4 - 28.0*x4*x2*z2 + 70.0*x4*z4 - 28.0*x2*z2*z4 + z4*z4)*k1*k2;
+            
+            p += p_in;
+
+            m = dot(p, p);
+            if (m > 256.0) break;
+        }
+
+        return 0.25 * log(m) * sqrt(m) / de;
+    }
+
     float scene_dist(vec3 p) {
-        return sphere_dist(p, 1.0);
+        return mandelbulb_poly_dist(p);
     }
 
-    vec3 get_normal(vec3 p) {
-        return normalize(vec3(
-            scene_dist(p + vec3(EPS, 0.0, 0.0)) - scene_dist(p + vec3(-EPS, 0.0, 0.0)),
-            scene_dist(p + vec3(0.0, EPS, 0.0)) - scene_dist(p + vec3(0.0, -EPS, 0.0)),
-            scene_dist(p + vec3(0.0, 0.0, EPS)) - scene_dist(p + vec3(0.0, 0.0, -EPS))
-        ));
+    vec3 get_normal(vec3 p)
+    {
+        vec2 e = vec2(1.0,-1.0)*0.001;
+        return normalize( e.xyy*scene_dist(p + e.xyy) + 
+                          e.yyx*scene_dist(p + e.yyx) + 
+                          e.yxy*scene_dist(p + e.yxy) + 
+                          e.xxx*scene_dist(p + e.xxx) );
     }
 
-    vec3 get_color(vec3 origin, vec3 ray) {
+    vec3 shade(vec3 origin, vec3 ray) {
         // marching loop
         float dist;
         float depth = 0.0;
         vec3 pos = origin;
 
-        #pragma unroll_loop
-        for ( int i = 0; i < 16; i ++ ){
+        for (int i = 0; i < 60; i++){
             dist = scene_dist(pos);
             depth += dist;
             pos = origin + depth * ray;
@@ -76,7 +131,7 @@ let raymarching_fragment_shader = `
         // cast ray
         vec3 color = vec3(0.0);
 
-        color = get_color(cPos, ray);
+        color = shade(cPos, ray);
 
         gl_FragColor = vec4(color, 1.0);
     }
