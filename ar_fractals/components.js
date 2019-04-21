@@ -19,7 +19,7 @@ let raymarching_fragment_shader = `
     }
 
     float scene_dist(vec3 p) {
-        return sphere_dist(p + vec3(-1.0, 0.0, -1.0), 0.3);
+        return sphere_dist(p - vec3(0.0, 1.0, 0.0), 1.3);
     }
 
     vec3 get_normal(vec3 p) {
@@ -36,7 +36,6 @@ let raymarching_fragment_shader = `
         float depth = 0.0;
         vec3 pos = origin;
 
-        #pragma unroll_loop
         for ( int i = 0; i < 16; i ++ ){
             dist = scene_dist(pos);
             depth += dist;
@@ -95,19 +94,16 @@ AFRAME.registerComponent("screen-quad", {
     Create screen-covering polygon and attach raymarching shaders to it
     */
     init: function () {
-        let camera = document.querySelector('#cam').components.camera.camera;
-
         let quad_geometry, quad_mesh, quad_material;
 
-        let width = window.innerWidth;
-        let height = window.innerHeight;
+        this.camera = document.querySelector('#ar-cam').components.camera.camera;
 
         quad_geometry = new THREE.PlaneBufferGeometry(2.0, 2.0);
         quad_material = new THREE.RawShaderMaterial({
             uniforms: {
-                resolution: { value: new THREE.Vector2(width, height) },
-                cameraWorldMatrix: { value: camera.matrixWorld },
-                cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse(camera.projectionMatrix) }
+                resolution: { value: new THREE.Vector2(window.innerWidth,  window.innerHeight) },
+                cameraWorldMatrix: { value: this.camera.matrixWorld },
+                cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse(this.camera.projectionMatrix) }
             },
             vertexShader: raymarching_vertex_shader,
             fragmentShader: raymarching_fragment_shader
@@ -119,6 +115,20 @@ AFRAME.registerComponent("screen-quad", {
         this.el.setObject3D("mesh", quad_mesh);
 
         window.addEventListener('resize', onWindowResize);
+    },
+    tick: function () {
+        // var position = new THREE.Vector3();
+        // var rotation = new THREE.Euler();
+
+        // this.el.object3D.getWorldPosition(position);
+        // this.el.object3D.getWorldRotation(rotation);
+        // if (this.camera === null)
+        // {
+            // this.camera = document.querySelector('#ar-cam').components.camera.camera;
+        // }
+
+        this.el.object3DMap["mesh"].material.uniforms.cameraWorldMatrix.value.copy(this.camera.matrixWorld);
+        // console.log(this.el.object3DMap["mesh"].material.uniforms.cameraWorldMatrix.value.elements);
     }
 });
 
@@ -126,12 +136,9 @@ function onWindowResize() {
     /*
     Update screen quad material uniforms to reflect window size changes
     */
-    let camera = document.querySelector('#cam').components.camera.camera;
+    let camera = document.querySelector('#ar-cam').components.camera.camera;
     let screen_quad = document.querySelector('#screen-quad').object3DMap["mesh"];
 
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-
-    screen_quad.material.uniforms.resolution.value.set(width, height);
+    screen_quad.material.uniforms.resolution.value.set(window.innerWidth, hewindow.innerHeightight);
     screen_quad.material.uniforms.cameraProjectionMatrixInverse.value.getInverse(camera.projectionMatrix);
 }
