@@ -146,7 +146,7 @@ let raymarching_vertex_shader = `
 `
 
 // globals
-let dolly, camera, scene, renderer, material, controls;
+let camera, scene, renderer;
 
 let stats;
 
@@ -185,7 +185,7 @@ function init() {
     scene.add(quad_mesh);
 
     // cam controls
-    controls = new THREE.OrbitControls(camera);
+    let controls = new THREE.OrbitControls(camera);
     
     // stats
     stats = new Stats();
@@ -205,9 +205,7 @@ function onWindowResize() {
 function render(time) {
     // measure fps and render
     stats.begin();
-
     renderer.render(scene, camera);
-
     stats.end();
 
     requestAnimationFrame(render);
