@@ -16,6 +16,11 @@ let raymarching_fragment_shader = `
         return length(p) - r;
     }
 
+    float box_dist(vec3 p, vec3 b){
+      vec3 d = abs(p) - b;
+      return length(max(d,0.0)) + min(max(d.x,max(d.y,d.z)),0.0);
+    }
+    
     float floor_dist(vec3 p){
         return dot(p, vec3(0.0, 1.0, 0.0)) + 1.0;
     }
@@ -76,7 +81,8 @@ let raymarching_fragment_shader = `
     }
 
     float scene_dist(vec3 p) {
-        return sphere_dist(p, 1.0);
+        return box_dist(p, vec3(1.0));
+        // return sphere_dist(p, 1.0);
         // return mandelbulb_dist(p);
     }
 

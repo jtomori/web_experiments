@@ -11,9 +11,9 @@
     <body>
         <!-- <a-scene vr-mode-ui="enabled: false" light="defaultLightsEnabled: false"> -->
         <a-scene embedded arjs="debugUIEnabled: false;" vr-mode-ui="enabled: false" light="defaultLightsEnabled: false">
-            <a-entity id="screen-quad" screen-quad></a-entity>
             <a-marker-camera id="ar-cam" preset="hiro"></a-marker-camera>
-            <a-box position="0 0 0" material="depthTest: false; shader: flat; opacity: 0.9; color: red"></a-box>
+            <a-entity id="screen-quad" screen-quad></a-entity>
+            <a-box position="0 0.5 0" material="depthTest: false; shader: flat; opacity: 0.9; color: red"></a-box>
         </a-scene>
     </body>
 </html>
