@@ -126,7 +126,7 @@ let raymarching_fragment_shader = `
     void main(void) {
         // screen space
         vec2 screenPos = (gl_FragCoord.xy / (resolution * pixel_ratio)) * 2.0 - 1.0;
-        // screenPos = gl_FragCoord.xy / (resolution * pixel_ratio);
+        screenPos = gl_FragCoord.xy / (resolution * pixel_ratio);
 
         // calculate ray direction
         vec3 ray = (cameraWorldMatrix * cameraProjectionMatrixInverse * vec4(screenPos, 1.0, 1.0)).xyz;
@@ -140,7 +140,7 @@ let raymarching_fragment_shader = `
         color = shade(cPos, ray);
 
         gl_FragColor = color;
-        // gl_FragColor = vec4(screenPos, 0.0, 1.0);
+        gl_FragColor = vec4(screenPos, 0.0, 1.0);
     }
 `
 

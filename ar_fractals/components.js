@@ -6,9 +6,9 @@ let raymarching_fragment_shader = `
     uniform mat4 cameraWorldMatrix;
     uniform mat4 cameraProjectionMatrixInverse;
 
-    const float EPS = 0.004;
+    const float EPS = 0.08;
     const vec3 LIGHT_DIR = vec3(-0.48666426339228763, 0.8111071056538127, -0.3244428422615251);
-    const float DIST_MULT = 0.98;
+    const float DIST_MULT = 1.0;
 
     // distance functions
     float sphere_dist(vec3 p, float r) {
@@ -80,9 +80,9 @@ let raymarching_fragment_shader = `
     }
 
     float scene_dist(vec3 p) {
-        return box_dist(p - vec3(0.0, 0.5, 0.0), vec3(1.0));
+        // return box_dist(p - vec3(0.0, 0.0, 0.0), vec3(1.0));
         // return sphere_dist(p + vec3(0.0, 0.5, 0.0), 1.0);
-        // return mandelbulb_dist(p);
+        return mandelbulb_poly_dist(p - vec3(0.0, 2.0, 0.0));
     }
 
     vec3 get_normal(vec3 p)
@@ -100,7 +100,7 @@ let raymarching_fragment_shader = `
         float depth = 0.0;
         vec3 pos = origin;
 
-        for (int i = 0; i < 20; i++){
+        for (int i = 0; i < 8; i++){
             dist = scene_dist(pos);
             depth += dist * DIST_MULT;
             pos = origin + depth * ray;
@@ -160,7 +160,6 @@ AFRAME.registerComponent("screen-quad", {
         this.camera_set = false;
         let canvas = this.el.sceneEl.canvas;
 
-        console.log(document.querySelector("#ar-cam").components.camera.camera);
         let camera = document.querySelector("#ar-cam").components.camera.camera;
 
         quad_geometry = new THREE.PlaneBufferGeometry(2.0, 2.0);
