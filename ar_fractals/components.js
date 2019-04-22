@@ -6,7 +6,7 @@ let raymarching_fragment_shader = `
     uniform mat4 cameraWorldMatrix;
     uniform mat4 cameraProjectionMatrixInverse;
 
-    const float EPS = 0.08;
+    const float EPS = 0.005;
     const vec3 LIGHT_DIR = vec3(-0.48666426339228763, 0.8111071056538127, -0.3244428422615251);
     const float DIST_MULT = 1.0;
 
@@ -80,9 +80,9 @@ let raymarching_fragment_shader = `
     }
 
     float scene_dist(vec3 p) {
-        // return box_dist(p - vec3(0.0, 0.0, 0.0), vec3(1.0));
+        // return box_dist(p + vec3(0.0, 0.0, 0.0), vec3(1.0));
         // return sphere_dist(p + vec3(0.0, 0.5, 0.0), 1.0);
-        return mandelbulb_poly_dist(p - vec3(0.0, 2.0, 0.0));
+        return mandelbulb_dist(p - vec3(0.0, 1.0, 0.0));
     }
 
     vec3 get_normal(vec3 p)
@@ -100,7 +100,7 @@ let raymarching_fragment_shader = `
         float depth = 0.0;
         vec3 pos = origin;
 
-        for (int i = 0; i < 8; i++){
+        for (int i = 0; i < 37; i++){
             dist = scene_dist(pos);
             depth += dist * DIST_MULT;
             pos = origin + depth * ray;
@@ -124,8 +124,17 @@ let raymarching_fragment_shader = `
 
     void main(void) {
         // screen space
-        vec2 screenPos = (gl_FragCoord.xy / resolution) * 2.0 - 1.0;
+        // vec2 screenPos = (gl_FragCoord.xy / resolution) * 2.0 - 1.0;
         // screenPos = gl_FragCoord.xy / resolution;
+        
+        vec2 screenPos = gl_FragCoord.xy / resolution;
+        
+        // screenPos.x = (screenPos.x * 1.78) - 0.39;
+        // screenPos.y = (screenPos.y * 1.01) - 0.008;
+
+        screenPos = screenPos * 2.0 - 1.0;
+
+        // if (screenPos.x > 1.0 || screenPos.x < 0.0 || screenPos.y > 1.0 || screenPos.y < 0.0) screenPos = vec2(0.0);
 
         // calculate ray direction
         vec3 ray = (cameraWorldMatrix * cameraProjectionMatrixInverse * vec4(screenPos, 1.0, 1.0)).xyz;
@@ -167,8 +176,8 @@ AFRAME.registerComponent("screen-quad", {
             uniforms: {
                 resolution: {value: new THREE.Vector2(canvas.width, canvas.height)},
                 cameraPosition: {value: camera.position},
-                cameraWorldMatrix: { value: camera.matrixWorld },
-                cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse(camera.projectionMatrix) }
+                cameraWorldMatrix: {value: camera.matrixWorld},
+                cameraProjectionMatrixInverse: {value: camera.projectionMatrixInverse}
             },
             vertexShader: raymarching_vertex_shader,
             fragmentShader: raymarching_fragment_shader
@@ -191,6 +200,8 @@ function onWindowResize() {
     let screen_quad = document.querySelector("#screen-quad").object3DMap["mesh"];
     let canvas = document.querySelector("canvas");
 
+    // camera.aspect = window.innerWidth / window.innerHeight;
+    // camera.updateProjectionMatrix();
+
     screen_quad.material.uniforms.resolution.value.set(canvas.width, canvas.height);
-    screen_quad.material.uniforms.cameraProjectionMatrixInverse.value.getInverse(camera.projectionMatrix);
 }
