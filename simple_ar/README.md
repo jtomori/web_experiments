@@ -1,0 +1,1 @@
+Simple AR example requiring [hiro marker](hiro.pdf). Using A-Frame.
